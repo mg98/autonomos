@@ -1,0 +1,74 @@
+{
+  "model": {
+    "fc_model": {
+      "sizes": [64],
+      "input_norm": false,
+      "activation": null,
+      "dropout": 0.0
+    },
+    "transformer": {
+      "N": 1,
+      "d_ff": 256,
+      "h": 4,
+      "positional_encoding" : null,
+      "dropout": 0.1
+    },
+    "post_model": {
+      "output_activation": "Sigmoid",
+      "d_output": 1
+    }
+  },
+  "data": {
+    "path": "/Users/marcel/Projects/aol4ps-ltr-dataset/.tmp/33719c6e99ae491383a57a95661d8d17/_normalized",
+    "validation_ds_role": "vali",
+    "num_workers": 0,
+    "batch_size": 64,
+    "slate_length": 10
+  },
+  "optimizer": {
+    "name": "Adam",
+    "args": {
+      "lr": 0.0001
+    }
+  },
+  "lr_scheduler": {
+    "name": "StepLR",
+    "args": {
+      "step_size": 50,
+      "gamma": 0.1
+    }
+  },
+  "training": {
+    "epochs": 100,
+    "early_stopping_patience": 7,
+    "gradient_clipping_norm": null
+  },
+  "val_metric": "mrr_10",
+  "metrics": [
+    "mrr_10"
+  ],
+  "loss": {
+    "name": "rankNet",
+    "args": {}
+  },
+  "detect_anomaly": false,
+  "expected_metrics" : {
+    "val": {
+      "mrr_10": 0.0
+    }
+  },
+  "wandb_project_id": "dart",
+  "click_model": {
+    "name": "allrank.click_models.cascade_models.DiverseClicksModel",
+    "args": {
+      "inner_click_model": {
+        "name": "allrank.click_models.cascade_models.BaseCascadeModel",
+        "args": {
+          "eta": 1,
+          "threshold": 0.5
+        }
+      },
+      "q_percentile": 0.5
+    }
+  }
+}

@@ -1,0 +1,4 @@
+[submodule "allRank"]
+	path = allRank
+	url = https://github.com/mg98/allRank
+	branch = custom

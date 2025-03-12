@@ -1,0 +1,10 @@
+.tmp/
+.vscode/
+out/
+**/__pycache__/
+**/.DS_Store
+.cache
+AOL4PS/
+*.lmdb
+*.lmdb.*
+semantica/*.csv

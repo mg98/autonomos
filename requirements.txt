@@ -1,0 +1,14 @@
+numpy==1.21.6
+pandas==1.3.5
+gcsfs
+joblib
+tqdm
+matplotlib==3.6.3
+scikit-learn
+rank-bm25
+torch
+torchvision
+tikzplotlib
+ir_datasets
+lmdb
+-e allRank
