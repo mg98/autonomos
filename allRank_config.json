@@ -22,7 +22,7 @@
     "path": "/Users/marcel/Projects/aol4ps-ltr-dataset/.tmp/33719c6e99ae491383a57a95661d8d17/_normalized",
     "validation_ds_role": "vali",
     "num_workers": 0,
-    "batch_size": 64,
+    "batch_size": 16,
     "slate_length": 10
   },
   "optimizer": {
@@ -40,7 +40,7 @@
   },
   "training": {
     "epochs": 100,
-    "early_stopping_patience": 7,
+    "early_stopping_patience": 10,
     "gradient_clipping_norm": null
   },
   "val_metric": "mrr_10",

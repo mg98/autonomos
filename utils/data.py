@@ -27,6 +27,7 @@ def compile_clickthrough_records(df: pd.DataFrame, queries_df: pd.DataFrame, doc
             doc = Document(
                 id=docid,
                 title=doc_record['Title'].strip().lower(),
+                body=doc_record['Body'].strip().lower(),
                 url=doc_record['Url'].strip().lower()
             )
             candidate_docs.append(doc)

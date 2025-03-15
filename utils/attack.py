@@ -3,6 +3,7 @@ import random
 from dataclasses import dataclass
 import pandas as pd
 from dart.types import Document
+from typing import Callable
 
 seed = 0
 
@@ -68,38 +69,19 @@ def rand_ctr() -> ClickThroughRecord:
 
     return ClickThroughRecord(
         rel=rand_norm_float() > 0.5,
-        qid=rand_int(666666, 6666666),
+        qid="q-" + str(rand_int(666666, 6666666)),
         feat=feat
     )
 
-# def realistic_fake_ctr(df: pd.DataFrame, queries_df: pd.DataFrame, docs_df: pd.DataFrame) -> ClickThroughRecord:
-#     """
-#     Generates a realistically looking but fake ClickThroughRecord.
-#     """
-#     # Convert candidate dataframe to list of Document objects
-#     candidate_docs = []
-#     for _, row in df.sample(10).iterrows():
-#         query_index = row['QueryIndex']
-#         candi_list = row['CandiList'].split('\t')
-        
-#         for docid in candi_list:
-#             doc_record = docs_df.loc[docid]
-#             doc = Document(
-#                 id=docid,
-#                 title=doc_record['Title'].strip().lower(),
-#                 url=doc_record['Url'].strip().lower()
-#             )
-#             candidate_docs.append(doc)
+def flip_label(ctr: ClickThroughRecord) -> ClickThroughRecord:
+    return ClickThroughRecord(rel=not ctr.rel, qid=ctr.qid, feat=ctr.feat)
 
-#     feat = FeatureVector.make()
-#     feat.title = rand_term_based_features()
-#     feat.url = rand_term_based_features()
-#     feat.number_of_slash_in_url = rand_norm_float()
-#     feat.pos = rand_norm_float()
-
-#     return ClickThroughRecord(
-#         rel=1.0,
-#         qid=rand_int(666666, 6666666),
-#         feat=feat
-#     )
-
+def poison_ctrs(
+        poison_fn: Callable[[ClickThroughRecord], ClickThroughRecord],
+        ctrs: list[ClickThroughRecord], 
+        ratio: float = 1.0
+        ) -> list[ClickThroughRecord]:
+    poison_count = int(len(ctrs) * ratio)
+    keep_count = len(ctrs) - poison_count
+    poison_ctrs = list(map(poison_fn, ctrs[keep_count:]))
+    return ctrs[:keep_count] + poison_ctrs

@@ -201,8 +201,9 @@ class TermBasedFeatures:
 
 class FeatureVector:
     title: TermBasedFeatures = TermBasedFeatures() # 0-33
-    url: TermBasedFeatures = TermBasedFeatures() # 34-67
-    number_of_slash_in_url: int = 0 # 68
+    body: TermBasedFeatures = TermBasedFeatures() # 34-67
+    url: TermBasedFeatures = TermBasedFeatures() # 68-101
+    number_of_slash_in_url: int = 0 # 102
 
     _user_id: str = ""
     _query_id: str = ""
@@ -212,8 +213,10 @@ class FeatureVector:
     def make(cls, candidate_docs: list[Document], doc: Document, query: str, query_id: str, user_id: str) -> 'FeatureVector':
         v = cls()
         title_corpus = Corpus({ doc.id: doc.title for doc in candidate_docs })
+        body_corpus = Corpus({ doc.id: doc.body for doc in candidate_docs })
         url_corpus = Corpus({ doc.id: doc.url for doc in candidate_docs })
         v.title = TermBasedFeatures.make(title_corpus, query, doc.id)
+        v.body = TermBasedFeatures.make(body_corpus, query, doc.id)
         v.url = TermBasedFeatures.make(url_corpus, query, doc.id)
         v.number_of_slash_in_url = url_corpus.docs[doc.id].count('/')
         v._doc_id = doc.id
@@ -237,6 +240,7 @@ class FeatureVector:
     def features(self):
         return [
             *self.title.features,
+            *self.body.features,
             *self.url.features,
             self.number_of_slash_in_url,
             # *self.query_embedding.tolist(),
@@ -255,7 +259,7 @@ class ClickThroughRecord:
     qid: str
     feat: FeatureVector
 
-    def __init__(self, rel=0.0, qid=0, feat=None): 
+    def __init__(self, rel=0.0, qid='q-0', feat=None): 
         self.rel = rel
         self.qid = qid
         self.feat = feat
