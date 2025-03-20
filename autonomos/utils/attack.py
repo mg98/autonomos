@@ -2,7 +2,6 @@ from dart.types import ClickThroughRecord, FeatureVector, TermBasedFeatures
 import random
 from dataclasses import dataclass
 import pandas as pd
-from dart.types import Document
 from typing import Callable
 
 seed = 0

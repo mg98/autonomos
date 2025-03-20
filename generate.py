@@ -1,4 +1,4 @@
-from datasets.aol4ps import load_dataset
+from datasets.aol import load_dataset
 from dart.utils import normalize_features
 from utils.data import compile_clickthrough_records
 from dart.utils import split_dataset_by_qids, write_records

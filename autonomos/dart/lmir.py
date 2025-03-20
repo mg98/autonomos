@@ -1,5 +1,5 @@
 import numpy as np
-from dart.utils import tokenize
+from autonomos.dart.utils import tokenize
 
 def collection_frequency(tokenized_docs: list[str], query_term: str) -> int:
     """

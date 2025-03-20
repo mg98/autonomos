@@ -11,4 +11,5 @@ torchvision
 tikzplotlib
 ir_datasets
 lmdb
+pyserini
 -e allRank

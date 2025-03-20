@@ -5,9 +5,9 @@ from typing import Dict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from rank_bm25 import BM25Okapi
 from dataclasses import dataclass
-from datasets.aol4ps import Document
-from utils.db import get_doc_embedding, get_query_embedding
-import warnings
+from autonomos.utils.db import get_doc_embedding, get_query_embedding
+import hashlib
+from ir_datasets.datasets.aol_ia import AolIaDoc
 
 def tokenize(text):
     return re.findall(r'\b\w+\b', text)
@@ -210,25 +210,18 @@ class FeatureVector:
     _doc_id: str = ""
 
     @classmethod
-    def make(cls, candidate_docs: list[Document], doc: Document, query: str, query_id: str, user_id: str) -> 'FeatureVector':
+    def make(cls, candidate_docs: list[AolIaDoc], doc: AolIaDoc, query: str, user_id: str) -> 'FeatureVector':
         v = cls()
-        title_corpus = Corpus({ doc.id: doc.title for doc in candidate_docs })
-        body_corpus = Corpus({ doc.id: doc.body for doc in candidate_docs })
-        url_corpus = Corpus({ doc.id: doc.url for doc in candidate_docs })
-        v.title = TermBasedFeatures.make(title_corpus, query, doc.id)
-        v.body = TermBasedFeatures.make(body_corpus, query, doc.id)
-        v.url = TermBasedFeatures.make(url_corpus, query, doc.id)
-        v.number_of_slash_in_url = url_corpus.docs[doc.id].count('/')
-        v._doc_id = doc.id
-        v._query_id = query_id
+        title_corpus = Corpus({ doc.doc_id: doc.title.lower().strip() for doc in candidate_docs })
+        body_corpus = Corpus({ doc.doc_id: doc.text.lower().strip() for doc in candidate_docs })
+        url_corpus = Corpus({ doc.doc_id: doc.url.lower().strip() for doc in candidate_docs })
+        v.title = TermBasedFeatures.make(title_corpus, query, doc.doc_id)
+        v.body = TermBasedFeatures.make(body_corpus, query, doc.doc_id)
+        v.url = TermBasedFeatures.make(url_corpus, query, doc.doc_id)
+        v.number_of_slash_in_url = url_corpus.docs[doc.doc_id].count('/')
+        v._doc_id = doc.doc_id
         v._user_id = user_id
         return v
-
-    @property
-    def query_embedding(self) -> np.ndarray: # 69-836
-        if self._query_id == "":
-            return np.zeros(768)
-        return get_query_embedding(self._query_id)
 
     @property
     def doc_embedding(self) -> np.ndarray: # 837-1604
@@ -254,15 +247,23 @@ class FeatureVector:
     def __str__(self):
         return ' '.join(f'{i}:{val}' for i, val in enumerate(self.features))
 
+
+def bounded_string_to_int_hash(s: str, N=1000000) -> int:
+    return int(hashlib.sha256(s.encode()).hexdigest(), 16) % N
+
 class ClickThroughRecord:
     rel: bool
     qid: str
     feat: FeatureVector
 
-    def __init__(self, rel=0.0, qid='q-0', feat=None): 
+    def __init__(self, rel=0.0, query="", feat=None): 
         self.rel = rel
-        self.qid = qid
+        self.query = bounded_string_to_int_hash(query)
         self.feat = feat
+
+    @property
+    def qid(self):
+        return bounded_string_to_int_hash(self.query)
 
     def to_dict(self):
         return {
@@ -272,7 +273,7 @@ class ClickThroughRecord:
         }
 
     def __str__(self):
-        return f'{int(self.rel)} qid:{self.qid[2:]} {self.feat}'
+        return f'{int(self.rel)} qid:{self.qid} {self.feat}'
     
 @dataclass
 class SplitDataset:

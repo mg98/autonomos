@@ -11,8 +11,8 @@ import warnings
 import os
 import shutil
 import ir_datasets
-from semantica.embed import embed_batch
-from datasets.aol4ps import load_dataset
+from autonomos.semantica.embed import embed_batch
+from autonomos.datasets.aol import load_dataset
 from hashlib import md5
 from ir_datasets.datasets.aol_ia import DID_LEN
 
@@ -37,12 +37,12 @@ if __name__ == "__main__":
     # The "batch_size" argument inside embed_batch controls how many chunks go through the GPU at once. Adjust if needed.
     embeddings = embed_batch(queries_df['Query'].tolist(), batch_size=256)
 
-    if os.path.exists('query_embeddings.lmdb'):
-        shutil.rmtree('query_embeddings.lmdb')
+    if os.path.exists('data/query_embeddings.lmdb'):
+        shutil.rmtree('data/query_embeddings.lmdb')
     
     print("Saving to disk...")
 
-    with lmdb.open('query_embeddings.lmdb', map_size=2**33) as db: # 2**26=64M
+    with lmdb.open('data/query_embeddings.lmdb', map_size=2**33, sync=False) as db: # 2**26=64M
         with db.begin(write=True) as txn:
             for qid, emb in tqdm(zip(qids, embeddings), total=len(qids)):
                 txn.put(str(qid).encode(), pickle.dumps(emb))

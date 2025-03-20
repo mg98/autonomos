@@ -4,7 +4,8 @@ out/
 **/__pycache__/
 **/.DS_Store
 .cache
-AOL4PS/
 *.lmdb
 *.lmdb.*
-semantica/*.csv
+autonomos/semantica/*.csv
+data/*
+!data/.gitkeep

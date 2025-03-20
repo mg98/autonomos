@@ -26,16 +26,16 @@ def retrieve_embedding(db_name: str, id: str, max_retries=8) -> np.ndarray:
             time.sleep(sleep_time)
 
 def get_doc_embedding(doc_id) -> np.ndarray:
-    return retrieve_embedding('doc_embeddings.lmdb', doc_id)
+    return retrieve_embedding('data/doc_embeddings.lmdb', doc_id)
 
 def get_query_embedding(query_id) -> np.ndarray:
-    return retrieve_embedding('query_embeddings.lmdb', query_id)
+    return retrieve_embedding('data/query_embeddings.lmdb', query_id)
 
 def get_user_embedding(user_id) -> np.ndarray:
-    return retrieve_embedding('user_embeddings.lmdb', user_id)
+    return retrieve_embedding('data/user_embeddings.lmdb', user_id)
 
 def get_ctrs(user_id: str) -> list: # TODO: refactoring: cannot specify list[ClickThroughRecord] because of circular import
-    return retrieve_embedding('user_ctrs.lmdb.docemb', user_id)
+    return retrieve_embedding('data/user_ctrs.lmdb.docemb', user_id)
         
 def get_ctrs_from_users(user_ids: list[str]) -> list:
     all_ctrs = []

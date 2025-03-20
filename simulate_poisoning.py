@@ -1,18 +1,18 @@
 import random
 import torch
 import numpy as np
-from dart.utils import split_by_qids, compute_feature_stats
+from autonomos.dart.utils import split_by_qids, compute_feature_stats
 from allrank.config import Config
-from dart.rank import evaluate
-from utils.data import compile_clickthrough_records
-from utils.cache import Cache
-from semantica.graph import get_neighbors
-from utils.db import get_ctrs, get_ctrs_from_users
-from utils.attack import poison_ctrs, flip_label, rand_ctr
-from dart.utils import ClickThroughRecord
-from datasets.aol4ps import load_dataset
+from autonomos.dart.rank import evaluate
+from autonomos.utils.data import compile_clickthrough_records
+from autonomos.utils.cache import Cache
+from autonomos.semantica.graph import get_neighbors
+from autonomos.utils.db import get_ctrs
+from autonomos.utils.attack import poison_ctrs, flip_label, rand_ctr
+from autonomos.dart.utils import ClickThroughRecord
+from autonomos.dart.types import Dataset
+from autonomos.datasets.aol import load_dataset
 from argparse import ArgumentParser
-from dart.types import Dataset
 from random import sample
 
 # Set random seeds for reproducibility
@@ -54,14 +54,12 @@ if __name__ == "__main__":
     config = Config.from_json("./allRank_config.json")
 
     if cache.is_empty():
-        print("Loading dataset...")
-        df, queries_df, docs_df = load_dataset('AOL4PS')
-        print("Dataset loaded.")
+        df = load_dataset()
         
         # This is done for normalization of features later
         print("Precomputing feature statistics from sample...")
         sample_df = df.sample(n=1000, random_state=42)
-        sample_ctrs = compile_clickthrough_records(sample_df, queries_df, docs_df)
+        sample_ctrs = compile_clickthrough_records(sample_df)
         feature_means, feature_stds = compute_feature_stats(sample_ctrs)
 
         cache.set("user_ids", df['AnonID'].unique())

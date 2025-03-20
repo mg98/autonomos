@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from datasets.aol4ps import load_dataset
-from utils.data import compile_clickthrough_records
+from autonomos.datasets.aol import load_dataset
+from autonomos.utils.data import compile_clickthrough_records
 import pickle
 import lmdb
 import warnings
@@ -30,13 +30,12 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 if __name__ == "__main__":
-    print("Loading data...")
-    df, queries_df, docs_df = load_dataset('AOL4PS')
-    user_groups = df.groupby('AnonID')
+    df = load_dataset()
+    user_groups = df.groupby('user_id')
     user_ids = list(user_groups.groups.keys())
-    
+
     ctrs = Parallel(n_jobs=16, batch_size=64)(
-        delayed(compile_clickthrough_records)(user_df, queries_df, docs_df) 
+        delayed(compile_clickthrough_records)(user_df) 
         for _, user_df in tqdm(
             user_groups, 
             total=len(user_groups), 
@@ -48,10 +47,10 @@ if __name__ == "__main__":
     print("Writing results to LMDB...")
     
     # Delete existing LMDB if it exists
-    if os.path.exists('user_ctrs.lmdb'):
-        shutil.rmtree('user_ctrs.lmdb')
+    if os.path.exists('data/ctrs.lmdb'):
+        shutil.rmtree('data/ctrs.lmdb')
 
-    with lmdb.open('user_ctrs.lmdb', map_size=2**44) as db: # 64M
+    with lmdb.open('data/ctrs.lmdb', map_size=2**44, sync=False) as db:
         with db.begin(write=True) as txn:
             for user_id, ctrs in tqdm(zip(user_ids, ctrs), desc="Writing to LMDB"):
                 txn.put(str(user_id).encode(), pickle.dumps(ctrs))

@@ -1,4 +1,4 @@
-from datasets.aol4ps import load_dataset
+from datasets.aol import load_dataset
 from utils.db import get_doc_embedding
 from semantica.graph import get_neighbors
 import random

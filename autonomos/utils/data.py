@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
-from dart.types import ClickThroughRecord, FeatureVector
-from datasets.aol4ps import Document
+from autonomos.dart.types import ClickThroughRecord, FeatureVector
 from joblib import Parallel, delayed
 from tqdm import tqdm
+import ir_datasets
+from ir_datasets.datasets.aol_ia import AolIaDoc
 
-def compile_clickthrough_records(df: pd.DataFrame, queries_df: pd.DataFrame, docs_df: pd.DataFrame, parallel: bool = False) -> list[ClickThroughRecord]:
+def compile_clickthrough_records(df: pd.DataFrame, parallel: bool = False) -> list[ClickThroughRecord]:
     """
     Compile raw clickthrough records into LTR-format records.
 
@@ -17,28 +18,22 @@ def compile_clickthrough_records(df: pd.DataFrame, queries_df: pd.DataFrame, doc
     """
     
     def process_row(row: pd.Series) -> ClickThroughRecord:
-        candidate_docids = row['CandiList'].split('\t')
-        query = queries_df.loc[row['QueryIndex']]['Query'].strip().lower()
-        candidate_docs = []
+        dataset = ir_datasets.load("aol-ia")
+        docs_store = dataset.docs_store()
+        candidate_docs: list[AolIaDoc] = []
 
         # Create candidate docs
-        for docid in candidate_docids:
-            doc_record = docs_df.loc[docid]
-            doc = Document(
-                id=docid,
-                title=doc_record['Title'].strip().lower(),
-                body=doc_record['Body'].strip().lower(),
-                url=doc_record['Url'].strip().lower()
-            )
+        for docid in row['candidate_doc_ids']:
+            doc = docs_store.get(docid)
             candidate_docs.append(doc)
 
         # Create clickthrough records for this row
         ctrs = []
-        for pos, doc in enumerate(candidate_docs):
+        for doc in candidate_docs:
             ctr = ClickThroughRecord(
-                pos == row['ClickPos'],
-                row['QueryIndex'],
-                FeatureVector.make(candidate_docs, doc, query, row['QueryIndex'], row['AnonID'])
+                doc.doc_id == row['doc_id'], 
+                row['query'], 
+                FeatureVector.make(candidate_docs, doc, row['query'], row['user_id'])
             )
             ctrs.append(ctr)
         

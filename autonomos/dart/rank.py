@@ -19,8 +19,8 @@ from functools import partial
 from torch import optim
 from copy import deepcopy
 import numpy as np
-from dart.types import FeatureVector, Dataset
-from dart.utils import normalize_features, write_records
+from autonomos.dart.types import FeatureVector, Dataset
+from autonomos.dart.utils import normalize_features, write_records
 
 dev = get_torch_device()
 

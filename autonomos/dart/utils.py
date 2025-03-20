@@ -1,8 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from dart.types import ClickThroughRecord, Dataset, SplitDataset, FeatureVector
-from datasets.aol4ps import Document
+from autonomos.dart.types import ClickThroughRecord, Dataset, SplitDataset
 from sklearn.datasets import load_svmlight_file, dump_svmlight_file
 
 def compute_feature_stats(sample: list[ClickThroughRecord]):
