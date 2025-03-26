@@ -8,4 +8,8 @@
 export JAVA_HOME=~/jdk-21.0.6
 export PATH=$JAVA_HOME/bin:$PATH
 
-~/miniconda3/envs/pyserini/bin/python ./create_index.py
+conda init bash
+source ~/.bashrc
+conda activate pyserini
+
+python create_index.py

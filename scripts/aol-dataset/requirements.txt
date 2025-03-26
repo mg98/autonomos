@@ -1,2 +1,0 @@
-ir_datasets
-pyserini

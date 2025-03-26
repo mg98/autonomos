@@ -1,15 +1,15 @@
 {
   "model": {
     "fc_model": {
-      "sizes": [64],
+      "sizes": [48],
       "input_norm": false,
       "activation": null,
       "dropout": 0.0
     },
     "transformer": {
       "N": 1,
-      "d_ff": 256,
-      "h": 4,
+      "d_ff": 192,
+      "h": 2,
       "positional_encoding" : null,
       "dropout": 0.1
     },

@@ -1,10 +1,15 @@
 import pandas as pd
 import numpy as np
-from autonomos.dart.types import ClickThroughRecord, FeatureVector
+from autonomos.dart.types import ClickThroughRecord, FeatureVector, bounded_string_to_int_hash
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import ir_datasets
 from ir_datasets.datasets.aol_ia import AolIaDoc
+import warnings
+
+def compile_clickthrough_records_as_arrays(df: pd.DataFrame, parallel: bool = False) -> list[np.ndarray]:
+    ctrs = compile_clickthrough_records(df, parallel)
+    return [ctr.to_array() for ctr in ctrs]
 
 def compile_clickthrough_records(df: pd.DataFrame, parallel: bool = False) -> list[ClickThroughRecord]:
     """
@@ -16,7 +21,6 @@ def compile_clickthrough_records(df: pd.DataFrame, parallel: bool = False) -> li
         docs_df: Dataframe containing all documents
         parallel: Whether to use parallel processing for acceleration
     """
-    
     def process_row(row: pd.Series) -> ClickThroughRecord:
         dataset = ir_datasets.load("aol-ia")
         docs_store = dataset.docs_store()
@@ -32,8 +36,8 @@ def compile_clickthrough_records(df: pd.DataFrame, parallel: bool = False) -> li
         for doc in candidate_docs:
             ctr = ClickThroughRecord(
                 doc.doc_id == row['doc_id'], 
-                row['query'], 
-                FeatureVector.make(candidate_docs, doc, row['query'], row['user_id'])
+                bounded_string_to_int_hash(row['query']), 
+                FeatureVector.make(candidate_docs, doc, row['query'])
             )
             ctrs.append(ctr)
         

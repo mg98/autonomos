@@ -1,4 +1,4 @@
-from dart.types import ClickThroughRecord, FeatureVector, TermBasedFeatures
+from autonomos.dart.types import ClickThroughRecord, FeatureVector, TermBasedFeatures
 import random
 from dataclasses import dataclass
 import pandas as pd
@@ -68,7 +68,7 @@ def rand_ctr() -> ClickThroughRecord:
 
     return ClickThroughRecord(
         rel=rand_norm_float() > 0.5,
-        qid="q-" + str(rand_int(666666, 6666666)),
+        qid=rand_int(666666, 6666666),
         feat=feat
     )
 

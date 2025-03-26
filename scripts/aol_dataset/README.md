@@ -15,46 +15,25 @@ Install project dependencies in an environment with **Python 3.10**.
 ```
 conda create -n pyserini python=3.10
 conda activate pyserini
-pip install -r requirements.txt
+make install
 ```
 
 Make sure **Java (JDK) 21** is installed on your system.
 
-## Run
+### Instructions for SLURM Users
 
-You need to create the search index before you can create the dataset.
-This will require ~7GB of disk space.
-
-```
-python create_index.py
-python create_dataset.py
-```
-
-Thereafter, you should find a `.csv` file in this folder.
-Feel free to `rm -r indexes`.
-
-Finally, t
-Move `aol_dataset.csv` inside the [`data`](/data) directory of this repository.
-
-### Instruction for SLURM Users
-
-If you run on SLURM, the corresponding scripts can be invoked by:
+The creation of the dataset is composed of four steps:
+1. Indexing
+2. Parallel proce
+If you run on SLURM, the corresponding scripts can be invoked with:
 
 ```
-sbatch ./create_index.sh
-# wait for job to finish...
-sbatch ./create_dataset.sh
+make 
 ```
 
-For parallel processing of the dataset, consider using:
+The last command will launch 16 instances, each working on different shards of the data, and accordingly generate several CSV files.
 
-```
-./parallel_create_dataset.sh
-```
-
-This will launch 16 instances, each working on different shards of the data, and accordingly generate several CSV files.
-
-After all jobs finished, merge generated CSV files using
+After all jobs finished, merge the generated CSV files using
 
 ```
 awk '(NR == 1) || (FNR > 1)' aol_*_*.csv > aol_dataset.csv

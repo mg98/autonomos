@@ -27,14 +27,9 @@ class Cache:
     def _load(self) -> None:
         """Load the cache from disk if it exists."""
         if not os.path.exists(self.cache_file):
-            return
-        
-        try:
-            with open(self.cache_file, 'rb') as f:
-                self.cache_data = pickle.load(f)
-        except Exception:
-            # If the cache file is corrupted, start with an empty cache
-            self.cache_data = {}
+            return        
+        with open(self.cache_file, 'rb') as f:
+            self.cache_data = pickle.load(f)
     
     def _save(self) -> None:
         """Save the cache to disk."""

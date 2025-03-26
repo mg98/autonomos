@@ -125,5 +125,4 @@ def evaluate(config: Config, ds: Dataset, feature_means: np.array, feature_stds:
         dart.train()
         return dart.test()
     finally:
-        # print(dataset_path)
         shutil.rmtree(dataset_path)
