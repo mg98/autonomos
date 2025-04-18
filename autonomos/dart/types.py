@@ -315,6 +315,43 @@ class SplitDataset:
     vali: list[ClickThroughRecord]
     test: list[ClickThroughRecord]
 
+    def _shuffle_maintain_groups(self, records: list[ClickThroughRecord]) -> list[ClickThroughRecord]:
+        """
+        Helper method to shuffle records while maintaining query groups.
+        
+        Args:
+            records: List of ClickThroughRecord objects
+            
+        Returns:
+            Shuffled list with query groups preserved
+        """
+        # Group records by query ID
+        query_groups = {}
+        for record in records:
+            if record.qid not in query_groups:
+                query_groups[record.qid] = []
+            query_groups[record.qid].append(record)
+        
+        # Get list of query IDs and shuffle their order
+        query_ids = list(query_groups.keys())
+        random.shuffle(query_ids)
+        
+        # Optionally shuffle records within each query group
+        for qid in query_ids:
+            random.shuffle(query_groups[qid])
+        
+        # Reconstruct the list with shuffled query order
+        shuffled_records = []
+        for qid in query_ids:
+            shuffled_records.extend(query_groups[qid])
+            
+        return shuffled_records
+
+    def shuffle(self):
+        self.train = self._shuffle_maintain_groups(self.train)
+        self.vali = self._shuffle_maintain_groups(self.vali)
+        self.test = self._shuffle_maintain_groups(self.test)
+
     def to_dict(self):
         return {
             'train': self.train,

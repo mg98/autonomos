@@ -10,10 +10,11 @@ from autonomos.semantica.graph import get_neighbors
 from autonomos.utils.db import get_ctrs
 from autonomos.utils.attack import poison_ctrs, flip_label, rand_ctr
 from autonomos.dart.utils import ClickThroughRecord
-from autonomos.dart.types import Dataset
+from autonomos.dart.types import SplitDataset
 from autonomos.datasets.aol import load_dataset
 from argparse import ArgumentParser
 import pandas as pd
+from copy import deepcopy
 
 # Set random seeds for reproducibility
 np.random.seed(42)
@@ -24,27 +25,46 @@ if hasattr(torch, 'mps'):
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-def selective_training(local_mrr, user_ds, neighbors_ctrs: list[list[ClickThroughRecord]]):
+def selective_training(local_mrr, _user_ds, neighbors_ctrs: list[list[ClickThroughRecord]]):
+    """
+    Selective integration of neighbors into local context.
+    Only accept neighbors that improve local MRR.
+
+    Args:
+        local_mrr: MRR of the local context
+        user_ds: Dataset object containing the local context
+        neighbors_ctrs: List of lists of ClickThroughRecords, where each inner list contains the CTRs for a single neighbor
+
+    Returns:
+        mrr_on_test: MRR of the integrated context on the test set
+        count_accepted_neighbors: Number of neighbors accepted into the local context
+    """
     # Selective integration
-    mrr_x = local_mrr
-    cur_mrr_l = local_mrr
-    cur_context = user_ds.context
+    user_ds = deepcopy(_user_ds)
     count_accepted_neighbors = 0
+    assert len(neighbors_ctrs) == 10
+
     for ctrs in neighbors_ctrs:
-        ds = Dataset(
-            cur_context + ctrs, 
-            user_ds.test
+        # Split local context into train/val (used for training) and test (used for evaluation of neighbor's dataset)
+        local_context_split = split_by_qids(user_ds.context)
+        ds = SplitDataset(
+            train=ctrs,
+            vali=local_context_split.context, # merge neighbor's ctrs into local context
+            test=local_context_split.test # use test set of local context for evaluation
         )
         mrr = evaluate(config, ds, feature_means, feature_stds)
-        if mrr > cur_mrr_l:
-            # dataset accepted
-            mrr_x = mrr
-            cur_mrr_l = mrr_x
-            cur_context = cur_context + ctrs
+        # Accept dataset if it improves local MRR
+        if mrr > local_mrr:
+            # Update local MRR and context
+            local_mrr = mrr
+            user_ds.context += ctrs
             count_accepted_neighbors += 1
-    
+     
+    # Evaluate final MRR on independent test set
+    mrr_on_test = evaluate(config, user_ds, feature_means, feature_stds)
+
     # Return final MRR
-    return mrr_x, count_accepted_neighbors
+    return mrr_on_test, local_mrr,count_accepted_neighbors
 
 def get_done_user_ids():
     try:
@@ -108,6 +128,7 @@ if __name__ == "__main__":
         # poison_ratio -> mrr
         lf_poisoned_mrrs: dict[int, float] = {}
         selective_lf_poisoned_mrrs: dict[int, float] = {}
+        selective_lf_poisoned_val_mrrs: dict[int, float] = {}
         count_accepted_neighbors: dict[int, int] = {}
 
         for N_poisoned in range(N+1):
@@ -129,12 +150,13 @@ if __name__ == "__main__":
 
             lf_poisoned_mrrs[N_poisoned] = evaluate(config, ds, feature_means, feature_stds)
 
-            selective_lf_poisoned_mrrs[N_poisoned], count_accepted_neighbors[N_poisoned] = selective_training(mrr_l, user_ds, neighbors_ctrs)
+            selective_lf_poisoned_mrrs[N_poisoned], selective_lf_poisoned_val_mrrs[N_poisoned], count_accepted_neighbors[N_poisoned] = selective_training(mrr_l, user_ds, neighbors_ctrs)
 
         sep = "\t"
         user_result = f"{user_id}{sep}{mrr_l}{sep}" + \
               sep.join([f"{lf_poisoned_mrrs[N_poisoned]}" for N_poisoned in range(N+1)]) + sep + \
               sep.join([f"{selective_lf_poisoned_mrrs[N_poisoned]}" for N_poisoned in range(N+1)]) + sep + \
+              sep.join([f"{selective_lf_poisoned_val_mrrs[N_poisoned]}" for N_poisoned in range(N+1)]) + sep + \
               sep.join([f"{count_accepted_neighbors[N_poisoned]}" for N_poisoned in range(N+1)])
         
         if args.job_id is not None:

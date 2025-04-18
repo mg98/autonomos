@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from autonomos.dart.types import ClickThroughRecord, Dataset, SplitDataset
 from sklearn.datasets import load_svmlight_file, dump_svmlight_file
+from autonomos.utils.cache import Cache
 
 def compute_feature_stats(sample: list[ClickThroughRecord]):
     """
@@ -23,6 +24,11 @@ def normalize_features(ds_path: str, means: np.array = None, stds: np.array = No
         means: List of means for each feature; if None, means will be computed from the dataset
         stds: List of standard deviations for each feature; if None, stds will be computed from the dataset
     """
+    cache = Cache()
+    assert not cache.is_empty()
+    means = cache.get('feature_means')
+    stds = cache.get('feature_stds')
+
     # features that are already between 0 and 1
     features_without_logarithm = list(range(27)) + [28, 32, 33] + list(range(34, 61)) + [62, 66, 67] + list(range(69, 69+2*768))
     # features that are negative

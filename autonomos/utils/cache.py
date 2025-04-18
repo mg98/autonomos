@@ -59,3 +59,7 @@ class Cache:
         """
         self.cache_data[key] = value
         self._save()
+
+    def keys(self) -> list[str]:
+        """Get all keys in the cache."""
+        return list(self.cache_data.keys())
