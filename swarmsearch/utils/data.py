@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from autonomos.dart.types import ClickThroughRecord, FeatureVector, bounded_string_to_int_hash
+from swarmsearch.dart.types import ClickThroughRecord, FeatureVector, bounded_string_to_int_hash
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import ir_datasets

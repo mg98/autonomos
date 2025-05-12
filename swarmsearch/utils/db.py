@@ -2,7 +2,7 @@ import lmdb
 import pickle
 import time
 import random
-from autonomos.dart.types import ClickThroughRecord
+from swarmsearch.dart.types import ClickThroughRecord
 import numpy as np
 
 def retrieve(db_name: str, id: str, max_retries=8) -> np.ndarray:

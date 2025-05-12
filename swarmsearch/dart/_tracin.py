@@ -1,14 +1,14 @@
 import torch
 from torch.utils.data import DataLoader
-from autonomos.dart.rank import loss_batch_gradients
-from autonomos.dart.types import SplitDataset, ClickThroughRecord
+from swarmsearch.dart.rank import loss_batch_gradients
+from swarmsearch.dart.types import SplitDataset, ClickThroughRecord
 from allrank.config import Config
-from autonomos.dart.rank import Model
+from swarmsearch.dart.rank import Model
 import shutil
 import uuid
 import os
 from copy import deepcopy
-from autonomos.dart.utils import write_records, normalize_features
+from swarmsearch.dart.utils import write_records, normalize_features
 from allrank.models.model_utils import get_torch_device
 from tqdm import tqdm
 from typing import List, Dict, Type

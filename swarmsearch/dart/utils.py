@@ -1,9 +1,9 @@
 import os
 import numpy as np
 import pandas as pd
-from autonomos.dart.types import ClickThroughRecord, Dataset, SplitDataset
+from swarmsearch.dart.types import ClickThroughRecord, Dataset, SplitDataset
 from sklearn.datasets import load_svmlight_file, dump_svmlight_file
-from autonomos.utils.cache import Cache
+from swarmsearch.utils.cache import Cache
 
 def compute_feature_stats(sample: list[ClickThroughRecord]):
     """

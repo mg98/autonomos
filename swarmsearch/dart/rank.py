@@ -22,9 +22,9 @@ from functools import partial
 from torch import optim
 from copy import deepcopy
 import numpy as np
-from autonomos.dart.types import FeatureVector, Dataset, SplitDataset, ClickThroughRecord
-from autonomos.dart.utils import normalize_features, write_records
-from autonomos.utils.cache import Cache
+from swarmsearch.dart.types import FeatureVector, Dataset, SplitDataset, ClickThroughRecord
+from swarmsearch.dart.utils import normalize_features, write_records
+from swarmsearch.utils.cache import Cache
 
 dev = get_torch_device()
 

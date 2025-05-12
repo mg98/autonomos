@@ -5,7 +5,7 @@ from tqdm import tqdm
 import pickle
 import lmdb
 import ir_datasets
-from autonomos.semantica.embed import embed_batch
+from swarmsearch.semantica.embed import embed_batch
 import argparse
 
 # Set random seeds for reproducibility

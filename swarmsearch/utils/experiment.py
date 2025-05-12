@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
 from typing import Callable
-from autonomos.datasets.aol import load_dataset
-from autonomos.utils.cache import Cache
-from autonomos.utils.data import compile_clickthrough_records
+from swarmsearch.datasets.aol import load_dataset
+from swarmsearch.utils.cache import Cache
+from swarmsearch.utils.data import compile_clickthrough_records
 from allrank.config import Config
-from autonomos.dart.utils import compute_feature_stats
+from swarmsearch.dart.utils import compute_feature_stats
 import pandas as pd
 import torch
 import numpy as np

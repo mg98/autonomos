@@ -9,3 +9,5 @@ out/
 autonomos/semantica/*.csv
 data/*
 !data/.gitkeep
+.RData
+.Rhistory

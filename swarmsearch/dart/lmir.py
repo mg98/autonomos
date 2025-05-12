@@ -1,5 +1,5 @@
 import numpy as np
-from autonomos.dart.utils import tokenize
+from swarmsearch.dart.utils import tokenize
 
 def collection_frequency(tokenized_docs: list[str], query_term: str) -> int:
     """

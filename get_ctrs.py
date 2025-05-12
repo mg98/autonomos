@@ -3,8 +3,8 @@ import torch
 import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from autonomos.datasets.aol import load_dataset
-from autonomos.utils.data import compile_clickthrough_records_as_arrays
+from swarmsearch.datasets.aol import load_dataset
+from swarmsearch.utils.data import compile_clickthrough_records_as_arrays
 import pickle
 import lmdb
 import warnings

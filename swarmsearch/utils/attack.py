@@ -1,4 +1,4 @@
-from autonomos.dart.types import ClickThroughRecord, FeatureVector, TermBasedFeatures
+from swarmsearch.dart.types import ClickThroughRecord, FeatureVector, TermBasedFeatures
 import random
 from dataclasses import dataclass
 import pandas as pd
