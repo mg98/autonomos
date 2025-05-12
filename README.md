@@ -22,7 +22,7 @@ In addition to the base dataset, for reasons of efficiency, we also precompile D
 To this end, please run
 
 ```bash
-python get_ctrs.py
+python scripts/get_ctrs.py
 ```
 
 This takes a long time. We recommend running it parallelized in a SLURM environment, for which we provide `scripts/get_ctrs.sbatch`.
@@ -39,7 +39,7 @@ tba
 In order to reproduce the results described in Section VII.B, please run the following command:
 
 ```
-python exp_spam_prevention.py
+python scripts/exp_spam_prevention.py
 ```
 
 For parallelized execution, use our SLURM script `sbatch scripts/exp_spam_prevention.sbatch`.
