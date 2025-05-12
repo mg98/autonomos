@@ -8,7 +8,7 @@ Please refer to [./scripts/aol_dataset](./scripts/aol_dataset) for detailed inst
 
 ## Installation
 
-This project requires Python 3.9.
+This project requires **Python 3.9**.
 Please run the following command to install dependencies.
 
 ```bash
@@ -17,7 +17,7 @@ make install
 
 ## Preprocessing
 
-In addition to the base dataset, for reasons of efficiency, we also precompile DART feature vectors or _clickthrough records (CTR)_.
+In addition to the base dataset, for reasons of efficiency, we also precompile DART feature vectors or _clickthrough records (CTR)_. This step is only needed for _Experiment #2_, and can be skipped otherwise.
 
 To this end, please run
 
