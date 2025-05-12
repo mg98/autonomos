@@ -23,7 +23,7 @@ def experiment_fn(exp: Experiment, user_id: str) -> list:
     # number of neighbors -> mrr (0 is local)
     attack_blind_mrrs: dict[int] = defaultdict(float)
     attack_aware_mrrs: dict[int] = defaultdict(float)
-    blocked_attackers: dict[int] = defaultdict(int)
+    attack_shapley_values: dict[int] = defaultdict(list[float])
 
     # load local dataset
     ctrs = get_ctrs(user_id)
@@ -34,7 +34,7 @@ def experiment_fn(exp: Experiment, user_id: str) -> list:
 
     # sample neighbors
     MAX_NEIGHBORS = 10
-    neighbor_user_ids = random.sample([uid for uid in exp.user_ids if uid != user_id], MAX_NEIGHBORS)
+    neighbor_user_ids = random.sample([uid for uid in exp.cache.get("user_ids") if uid != user_id], MAX_NEIGHBORS)
 
     healthy_candidate_datasets = {
         neighbor_id: get_ctrs(neighbor_id)
@@ -69,15 +69,19 @@ def experiment_fn(exp: Experiment, user_id: str) -> list:
             vali=user_ds.vali,
             test=user_ds.test
         ))
-        blocked_attackers[attack_vol] = MAX_NEIGHBORS - len(candidate_datasets)
+
+        attack_shapley_values[attack_vol] = shapley_values.values()
 
     return [user_id, local_mrr] + [
         attack_blind_mrrs[n_neighbors] for n_neighbors in range(MAX_NEIGHBORS+1)
         ] + [
         attack_aware_mrrs[n_neighbors] for n_neighbors in range(MAX_NEIGHBORS+1)
         ] + [
-        blocked_attackers[n_neighbors] for n_neighbors in range(MAX_NEIGHBORS+1)
+        sv for n_neighbors in range(MAX_NEIGHBORS+1) for sv in attack_shapley_values[n_neighbors]
+        ] + [
+        user_id for user_id in neighbor_user_ids
         ]
+
 
 if __name__ == "__main__":
     exp = Experiment(

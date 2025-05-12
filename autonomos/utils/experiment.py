@@ -20,7 +20,7 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 class Experiment:
-    def __init__(self, id: str, fn: Callable[["Experiment", str], list]):
+    def __init__(self, id: str, fn: Callable[["Experiment", str], list], user_ids_source: str = None):
         """
         Initialize the experiment.
         
@@ -38,20 +38,28 @@ class Experiment:
         self._setup_cache()
         self.export_path = f"results/experiment_{id}.tsv"
         self.fn = fn
+        self.user_ids_source = user_ids_source
 
     @property
     def user_ids(self) -> set[str]:
+        """
+        Returns user IDs to simulate in this experiment run.
+        """
+
         if self.args.user is not None:
             return {self.args.user}
         
-        # df = load_dataset()
-        # user_ids = sorted(df['user_id'].unique())
-        user_ids = self.cache.get("user_ids")
+        user_ids = set()
+        if self.user_ids_source is not None:
+            shapley_df = pd.read_csv(self.user_ids_source, sep='\t', header=None)
+            user_ids = set(shapley_df[0])
+        else:
+            user_ids = set(self.cache.get("user_ids"))
 
         if self.args.job_id is not None:
             user_ids = set(user_id for user_id in user_ids if user_id % self.args.job_count == self.args.job_id)
-        
-        return set(user_id for user_id in user_ids if user_id not in self.get_done_user_ids())
+
+        return user_ids - self.get_done_user_ids()
 
     def _setup_cache(self):
         self.cache = Cache()
@@ -69,7 +77,7 @@ class Experiment:
     def get_done_user_ids(self) -> set[str]:
         try:
             results_df = pd.read_csv(self.export_path, sep='\t', header=None)
-            return set(results_df[0].astype(int))
+            return set(results_df[0])
         except FileNotFoundError:
             return set()
 
@@ -83,7 +91,7 @@ class Experiment:
                 with open(self.export_path, "a") as f:
                     f.write(result_string + "\n")
             else:
-                print('hello',result_string)
+                print(result_string)
 
         Parallel(n_jobs=8 if parallel else 1)(
                 delayed(process_user)(user_id) for user_id in self.user_ids

@@ -120,8 +120,10 @@ class Model:
 
         return np.mean(mrrs)
 
-def evaluate(config: Config, ds: SplitDataset):
-    config = deepcopy(config)
+def evaluate(_config: Config, _ds: SplitDataset):
+    config = deepcopy(_config)
+    ds = deepcopy(_ds)
+
     ds.shuffle()
     dataset_path = f'.tmp/{uuid.uuid4().hex}'
     write_records(dataset_path, ds)
@@ -213,24 +215,7 @@ def tracincp_valuation(config: Config, user_ds: SplitDataset, candidate_datasets
             avg_dataset_scores[dataset_id] = 0.0
     
     return avg_dataset_scores
-        
 
-
-# def shapley_valuation(config: Config, user_ds: Dataset, candidate_datasets: dict[str,list[ClickThroughRecord]], num_samples: int) -> dict[str, float]:
-#     shapley_values = {user_id: 0.0 for user_id in candidate_datasets.keys()}  # Initialize Shapley value estimates
-#     perms = [random.sample(list(candidate_datasets.keys()), k=len(candidate_datasets)) for _ in range(num_samples)]
-
-#     for perm in perms:
-#         subset = []
-#         prev_value = 0.0
-#         for user_id in perm:
-#             x = candidate_datasets[user_id]
-#             subset.extend(x)
-#             new_value = evaluate(config, Dataset(user_ds.context + subset, user_ds.test))
-#             marginal_contribution = new_value - prev_value
-#             shapley_values[user_id] += marginal_contribution
-#             prev_value = new_value
-#     return shapley_values
 
 def shapley_valuation(config: Config, user_ds: SplitDataset, candidate_datasets: dict[str,list[ClickThroughRecord]], num_samples: int) -> dict[str, float]:
     shapley_values = {user_id: 0.0 for user_id in candidate_datasets.keys()}
