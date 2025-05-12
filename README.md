@@ -4,7 +4,7 @@ This repository collects the code used to generate the dataset and experimental 
 
 ## Dataset
 
-Please refer to [./scripts/aol_dataset](./scripts/aol_dataset) for detailed instructions on how to compile the AOL dataset used throughout this project.
+Please refer to [`./scripts/aol_dataset`](./scripts/aol_dataset) for detailed instructions on how to compile the AOL dataset used throughout this project.
 
 ## Installation
 
@@ -54,4 +54,4 @@ tba
 
 ## Plotting
 
-We used R for the visualization of our results, see [./plotting.R](./plotting.R).
+We used R for the visualization of our results, see [`./plotting.R`](./plotting.R).
