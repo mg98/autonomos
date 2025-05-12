@@ -19,7 +19,6 @@ from swarmsearch.utils.experiment import Experiment
 from swarmsearch.dart.rank import tracincp_valuation
 from tqdm import tqdm
 
-shapley_df = pd.read_csv('results/experiment_shapley.tsv', sep='\t', header=None)
 
 def experiment_fn(exp: Experiment, user_id: str) -> list:
     # sample neighbors
