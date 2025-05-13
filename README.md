@@ -1,6 +1,6 @@
 # 🕸️🔍 SwarmSearch
 
-This repository collects the code used to generate the dataset and experimental results for _"SwarmSearch: Decentralized Search Engine with Self-Funding Economy"_ [preprint].
+This repository collects the code used to generate the dataset and experimental results for _"SwarmSearch: Decentralized Search Engine with Self-Funding Economy"_ [[preprint](https://arxiv.org/pdf/2505.07452)].
 
 ## 💾 Dataset
 
